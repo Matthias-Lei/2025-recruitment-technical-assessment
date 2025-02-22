@@ -29,7 +29,8 @@ class Ingredient(CookbookEntry):
 app = Flask(__name__)
 
 # Store your recipes here!
-cookbook = None
+# cookbook = None
+cookbook = {"recipes": {}, "ingredients": {}, "entries": []}
 
 # Task 1 helper (don't touch)
 @app.route("/parse", methods=['POST'])
@@ -44,24 +45,45 @@ def parse():
 # [TASK 1] ====================================================================
 # Takes in a recipeName and returns it in a form that 
 def parse_handwriting(recipeName: str) -> Union[str | None]:
-	recipe_name = recipe_name.replace("-", " ")
-	recipe_name = recipe_name.replace("_", " ")
-	recipe_name = re.sub("[^A-Za-z]", "", recipe_name).title()
-	recipe_name = re.sub(" {2,}", " ", recipe_name.strip())
-	if len(recipe_name) > 0:
+	recipeName = recipeName.replace("-", " ")
+	recipeName = recipeName.replace("_", " ")
+	recipeName = re.sub("[^A-Za-z ]", "", recipeName).title()
+	recipeName = re.sub(" {2,}", " ", recipeName.strip())
+	if len(recipeName) > 0:
 		return recipeName
 	else:
 		return None
 
-def validate_cookbook_entry(recipeJson: dict) -> bool:
+def validate_cookbook_entry(recipeDict: dict) -> bool:
+	recipeType = recipeDict["type"]
+	recipeName = recipeDict["name"]
+	recipeItems = recipeDict["requiredItems"]
+
+	if recipeType not in ("recipe", "ingredient"):
+		return False
+	if recipeType == "ingredient" and recipeDict["cookTime"] < 0:
+		return False
+	if recipeName in cookbook["entries"]:
+		return False
 	
+	ingredients = [item["name"] for item in recipeItems]
+	if len(set(ingredients)) != len(ingredients):
+		return False	
+	
+	cookbook["recipes"][recipeName] = recipeItems
+	cookbook["entries"].append(recipeName)
+	return True
 
 # [TASK 2] ====================================================================
 # Endpoint that adds a CookbookEntry to your magical cookbook
 @app.route('/entry', methods=['POST'])
 def create_entry():
+	if validate_cookbook_entry(request.json()):
+		return 200
+	else:
+		return 400
 	# TODO: implement me
-	return 'not implemented', 500
+	# return 'not implemented', 500
 
 
 # [TASK 3] ====================================================================
