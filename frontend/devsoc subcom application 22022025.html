@@ -1,0 +1,252 @@
+<!--SHArdow-->
+
+<!doctype html>
+
+<html lang="en">
+
+    <head>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="A site by SHArdow">
+        <meta name="theme-color" content="#242424">
+        <meta name="robots" content="noindex, nofollow, noimageindex, noarchive, nosnippet">
+        <meta name="author" content="shardow">
+        <meta name="og:title" content="freerooms">
+        <meta name="og:description" content="A site by SHArdow">
+        <meta name="og:image" content="">
+        <meta name="og:url" content="">
+        <meta name="og:type" content="website">
+        <title>mFreerooms</title>
+        <link rel="icon" href="assets/freeRoomsLogo.png">
+        <link rel="apple-touch-icon" href="assets/freeRoomsLogo.png">
+        <link rel="manifest" href="manifest.webmanifest">
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto&display=swap">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+        <style>
+
+            body
+            {
+                font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+            }
+
+
+            .navbar
+            {
+                display: flex;
+                align-items: center;
+                margin: 16px;
+                height: 36px;
+            }
+
+            #freeroomsLogo
+            {
+                height: 40px;
+                margin-right: 10px;
+                cursor: pointer;
+            }
+
+            #freeroomsText
+            {
+                font-size: 36px;
+                color: #EF6C00;
+            }
+
+            #freeroomsSearch
+            {
+                height: 36px;
+                margin: 24px;
+                flex-grow: 1;
+            }
+
+            .navbarButton
+            {
+                margin: 12px;
+                cursor: pointer;
+                color: #EF6C00;
+                font-size: 28px;
+            }
+
+
+            #buildingContainer
+            {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, 320px);
+                grid-template-rows: repeat(auto-fill, 360px);
+                row-gap: 20px;
+                column-gap: 20px;
+                padding: 20px;
+                
+            }
+
+            .buildingCard
+            {
+                position: relative;
+                overflow: hidden;
+                width: 320px;
+                height: 360px;
+                display: grid;
+                grid-template-columns: 45% 55%;
+                grid-template-rows: 17.5% 60% 22.5%;
+                border-radius: 12px;
+                background-size: auto 100%;
+                background-position: center;
+                color: #FFFFFF;
+                
+            }
+
+            .buildingStatus
+            {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                background-color: #FFFFFF;
+                width: 72%;
+                grid-area: 1 / 2 / 2 / 3;
+                padding: 16px;
+                border-radius: 16px;
+                margin: 12px;
+                font-weight: bold;
+                color: #000000;
+                font-size: 12px;
+
+            }
+            .buildingName
+            {
+                align-items: center;
+                background-color: #EF6C00;
+                color: #FFFFFF;
+                padding: 12px;
+                font-weight: bold;
+                grid-area: 3 / 1 / 4 / 3;
+                width: 85%;
+                display: flex;
+                margin: 12px;
+                border-radius: 16px;
+            }
+            
+
+        </style>
+
+    </head>
+
+
+    <body>
+
+        <div class="navbar">
+
+            <img id="freeroomsLogo" src="assets/freeRoomsLogo.png" alt="Freerooms Logo">
+            <div id="freeroomsText" >Freerooms</div>
+            
+            <input id="freeroomsSearch" type="text placeholder="Search for a building...">
+
+            <div class="material-icons navbarButton">search</div>
+            <div class="material-icons navbarButton">grid_view</div>
+            <div class="material-icons navbarButton">map</div>
+            <div class="material-icons navbarButton">dark_mode</div>
+
+            <div class="material-icons navbarButton">filter_list</div>
+            <div class="material-icons navbarButton">sort</div>
+
+        </div>
+
+
+        <div id="buildingContainer"></div>
+
+
+
+
+
+
+        <script>
+
+
+        
+            buildings = 
+            [
+                {
+                    "name": "AGSM", 
+                    "rooms_available": 9,
+                    "building_picture": "./assets/agsm.webp"
+                },
+                {
+                    "name": "Ainsworth Building",
+                    "rooms_available": 16,
+                    "building_picture": "./assets/ainsworth.webp"
+                },
+                {
+                    "name": "Anita B Lawrence Centre",
+                    "rooms_available": 44,
+                    "building_picture": "./assets/anitab.webp"
+                },
+                {
+                    "name": "Biological Sciences",
+                    "rooms_available": 6,
+                    "building_picture": "./assets/biologicalScience.webp"
+                },
+                {
+                    "name": "Biological Science (West)",
+                    "rooms_available": 8,
+                    "building_picture": "./assets/biologicalScienceWest.webp"
+                },
+                {
+                    "name": "Blockhouse",
+                    "rooms_available": 42,
+                    "building_picture": "./assets/blockhouse.webp"
+                },
+                {
+                    "name": "Business School",
+                    "rooms_available": 18,
+                    "building_picture": "./assets/businessSchool.webp"
+                },
+                {
+                    "name": "Civil Engineering Building",
+                    "rooms_available": 8,
+                    "building_picture": "./assets/civilBuilding.webp"
+                },
+                {
+                    "name": "Colombo Building",
+                    "rooms_available": 5,
+                    "building_picture": "./assets/colombo.webp"
+                },
+                {
+                    "name": "Computer Science & Eng (K17)",
+                    "rooms_available": 7,
+                    "building_picture": "./assets/cseBuilding.webp"
+                }
+            ];
+
+            container = document.getElementById("buildingContainer");
+            buildings.forEach
+            (
+                function(building)
+                {
+
+                    buildingCard = document.createElement("div");
+                    buildingCard.classList.add("buildingCard");
+                    buildingCard.style.backgroundImage = `url(${building.building_picture})`;
+
+                    buildingStatus = document.createElement("div");
+                    buildingStatus.classList.add("buildingStatus");
+                    buildingStatus.textContent = `${building.rooms_available} rooms available`;
+
+                    buildingName = document.createElement("div");
+                    buildingName.classList.add("buildingName");
+                    buildingName.textContent = `${building.name}`;
+
+                    buildingCard.appendChild(buildingStatus);
+                    buildingCard.appendChild(buildingName);
+
+                    container.appendChild(buildingCard);
+                    
+                }
+            );
+
+        </script>
+
+    </body>
+
+
+</html>
