@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import List, Dict, Union
 from flask import Flask, request, jsonify
 import re
+import json
 
 # ==== Type Definitions, feel free to add or modify ===========================
 @dataclass
@@ -43,9 +44,17 @@ def parse():
 # [TASK 1] ====================================================================
 # Takes in a recipeName and returns it in a form that 
 def parse_handwriting(recipeName: str) -> Union[str | None]:
-	# TODO: implement me
-	return recipeName
+	recipe_name = recipe_name.replace("-", " ")
+	recipe_name = recipe_name.replace("_", " ")
+	recipe_name = re.sub("[^A-Za-z]", "", recipe_name).title()
+	recipe_name = re.sub(" {2,}", " ", recipe_name.strip())
+	if len(recipe_name) > 0:
+		return recipeName
+	else:
+		return None
 
+def validate_cookbook_entry(recipeJson: dict) -> bool:
+	
 
 # [TASK 2] ====================================================================
 # Endpoint that adds a CookbookEntry to your magical cookbook
