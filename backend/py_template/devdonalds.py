@@ -4,6 +4,8 @@ from flask import Flask, request, jsonify
 import re
 import json
 
+import logging
+
 # ==== Type Definitions, feel free to add or modify ===========================
 @dataclass
 class CookbookEntry:
@@ -54,34 +56,41 @@ def parse_handwriting(recipeName: str) -> Union[str | None]:
 	else:
 		return None
 
-def validate_cookbook_entry(recipeDict: dict) -> bool:
-	recipeType = recipeDict["type"]
-	recipeName = recipeDict["name"]
-	recipeItems = recipeDict["requiredItems"]
+def validate_cookbook_entry(entryDict: dict) -> bool:
+	entryType = entryDict["type"]
+	entryName = entryDict["name"]
 
-	if recipeType not in ("recipe", "ingredient"):
+	if entryName in cookbook["entries"]:
 		return False
-	if recipeType == "ingredient" and recipeDict["cookTime"] < 0:
+	if entryType not in ("recipe", "ingredient"):
 		return False
-	if recipeName in cookbook["entries"]:
-		return False
-	
-	ingredients = [item["name"] for item in recipeItems]
-	if len(set(ingredients)) != len(ingredients):
-		return False	
-	
-	cookbook["recipes"][recipeName] = recipeItems
-	cookbook["entries"].append(recipeName)
+
+	if entryType == "recipe":
+		recipeItems = entryDict["requiredItems"]
+		ingredients = [item["name"] for item in recipeItems]
+		if len(set(ingredients)) != len(ingredients):
+			return False
+		ingredients = [RequiredItem(item["name"], item["quantity"]) for item in recipeItems]
+		# cookbook["recipes"][entryName] = recipeItems
+		cookbook["recipes"][entryName] = Recipe(name=entryName, required_items=ingredients)
+	else:
+		if entryDict["cookTime"] < 0:
+			return False
+		# cookbook["ingredients"][entryName] = entryDict["cookTime"]
+		cookbook["ingredients"][entryName] = Ingredient(name=entryName, cook_time=entryDict["cookTime"])
+
+
+	cookbook["entries"].append(entryName)
 	return True
 
 # [TASK 2] ====================================================================
 # Endpoint that adds a CookbookEntry to your magical cookbook
 @app.route('/entry', methods=['POST'])
 def create_entry():
-	if validate_cookbook_entry(request.json()):
-		return 200
+	if validate_cookbook_entry(request.json):
+		return "", 200
 	else:
-		return 400
+		return "", 400
 	# TODO: implement me
 	# return 'not implemented', 500
 
@@ -90,6 +99,16 @@ def create_entry():
 # Endpoint that returns a summary of a recipe that corresponds to a query name
 @app.route('/summary', methods=['GET'])
 def summary():
+	recipeName = request.args["name"]
+	try:
+		recipe = cookbook["recipes"][recipeName]
+		required_items = recipe.required_items
+		cooking_time = sum([cookbook["ingredients"][item.name].cook_time * item.quantity for item in required_items])
+		return jsonify({"name": recipeName, "cookTime": cooking_time, "ingredients": required_items}), 200
+	except KeyError:
+		return "", 400
+	
+	
 	# TODO: implement me
 	return 'not implemented', 500
 
